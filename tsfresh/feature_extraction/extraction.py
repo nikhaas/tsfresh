@@ -12,6 +12,7 @@ import logging
 import warnings
 from functools import partial
 from multiprocessing import Pool
+import signal
 
 import numpy as np
 import pandas as pd
@@ -25,6 +26,8 @@ from tsfresh.utilities.string_manipulation import convert_to_output_format
 
 _logger = logging.getLogger(__name__)
 
+def init_worker():
+    signal.signal(signal.SIGINT, signal.SIG_IGN)
 
 def extract_features(timeseries_container, default_fc_parameters=None,
                      kind_to_fc_parameters=None,
@@ -212,7 +215,7 @@ def _do_extraction(df, column_id, column_value, column_kind,
     if n_jobs == 0:
         map_function = map
     else:
-        pool = Pool(n_jobs)
+        pool = Pool(n_jobs, init_worker)
 
         if not chunksize:
             chunksize = _calculate_best_chunksize(data_in_chunks, n_jobs)
@@ -242,7 +245,7 @@ def _do_extraction(df, column_id, column_value, column_kind,
         pool.close()
         pool.terminate()
         pool.join()
-        
+
     return result
 
 
