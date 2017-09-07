@@ -287,7 +287,7 @@ def agg_autocorrelation(x, param):
     if abs(var) < 10**-10 or n == 1:
         a = 0
     else:
-        a = acf(x, unbiased=True, fft=n > 1250)[1:]
+        a = acf(x, unbiased=False, nlags=n, fft=n > 1250)[1:]
     return [("f_agg_\"{}\"".format(config["f_agg"]), getattr(np, config["f_agg"])(a)) for config in param]
 
 
